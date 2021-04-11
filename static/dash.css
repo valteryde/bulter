@@ -1,0 +1,365 @@
+
+/* palette */
+:root {
+	--cl-darkgreen: #3D5B59;
+	--cl-blue: #000C66;
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+body {
+	font-family: 'Open Sans', sans-serif;
+}
+
+.iconmid {
+	vertical-align: middle;
+}
+
+.us {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.wrapper-cal {
+	margin-left: 4%;
+	margin-right: 4%;
+}
+
+/*NAVBAR*/
+.navbarCustom {
+	background: white!important;
+	color: black;
+	opacity: 0.7;
+}
+
+.navBarLinks {
+
+}
+
+.navBarMenuOpen {
+	display: none;
+	font-size: 300%;
+	margin-left: 4%;
+}
+
+article.cardWrapper {
+	position:relative;
+	margin-top:2%;
+	background:white;
+	width:100%;
+	box-shadow:0px 2px 4px 2px lightgrey;
+	padding:4%;
+	margin-bottom:8%;
+	color: grey;
+	cursor: pointer;
+	padding-left: 4%;
+	border-left: solid 0px var(--cl-darkgreen);
+	border-radius: 2px;
+	transition: box-shadow .4s, border .15s, padding .15s;
+}
+article.cardWrapper:hover {
+	box-shadow: 0px 2px 8px 4px lightgrey;
+	padding-left: 2%;
+	border-left: solid 6px var(--cl-darkgreen);
+}
+
+#adeCardFeedWrapper {
+	display: none;
+	position: absolute;
+	right: 4%;
+	margin-top:1%;
+	box-shadow: 2px 0px 14px 8px lightgrey;
+	width: 16%;
+	height: 82%;
+	border: solid 1px lightgrey;
+	border-radius: 6px;
+	padding: 1%;
+	color: grey;
+	overflow: scroll;
+}
+
+.centerDiv {
+	position: relative;
+	left: 50%;
+	transform: translate(-50%,0);
+}
+
+@media screen and (min-width: 1200px) {
+	.wrapper-cal {
+		width: 80%;
+	}
+	#adeCardFeedWrapper {display: block};
+}
+
+@media screen and (max-width: 1200px) {
+	.wrapper-cal {
+		width: 100%;
+	}
+}
+
+article.outerCard {
+	position: relative;
+	min-height: 100px;
+	max-height: 200px;
+	width: 12%;
+	margin: .8%;
+	padding: .8%;
+	transition: padding .4s, width .2s;
+}
+
+article.outerCard:hover{
+	padding: 1.8%;
+	padding-top: 1%;
+	cursor: pointer;
+}
+
+.card {
+	position: relative;
+	box-shadow: 0px 0px 14px 1px lightgrey;
+	border-radius: 10px;
+	width: 108%;
+	padding: 4%;
+	height: 108%;
+	border: none;
+	overflow: hidden;
+}
+
+
+.today {
+	/* should get a retouch */
+
+	background: rgb(195,123,34);
+	background: lightgrey;
+	border: dashed 4px white;
+	/*color: white;*/
+}
+
+@media screen and (max-width: 800px) {
+	article.outerCard {
+		width: 30%;
+		padding: 2%;
+	}
+	.navBarLinks {
+		display: none;
+	}
+	.navBarMenuOpen {
+		display: block;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	article.outerCard {
+		width: 45%;
+		padding: 3%;
+	}
+	#friendWrapper {
+		position: relative;
+		width: 130%!important;
+		left: -15%!important;
+	}
+	.navBarMenuOpen {
+		display: block;
+	}
+	.navBarLinks {
+		display: none;
+	}
+}
+
+.eventInCard {
+	position: absolute;
+	width: 108%;
+	margin-left: -4%;
+}
+
+p.numDate {
+	z-index: 1;
+	color: grey;
+}
+
+#friendWrapper {
+	position: relative;
+	left: -5%;
+	width: 110%;
+	padding: 2%;
+	box-shadow: 2px 2px 14px 2px lightgrey;
+	border-radius: 4px;
+}
+
+#friendInvite {
+	position: relative;
+	width: 100%;
+	margin-bottom: 5%;
+	border: none;
+	border-bottom: solid 4px var(--cl-darkgreen);
+	transition: background .4s;
+	outline: solid 3px transparent;
+	border-radius: 1px;
+}
+
+.resultFriendsListCard {
+	position: relative;
+	width: 100%;
+	background: white;
+	box-shadow: 0px 0px 8px 2px lightgrey;
+	outline: none;
+	border-radius: 6px;
+	border: none;
+	margin-bottom: 2%;
+	height: 40px;
+	text-align: left;
+	/*text-transform: capitalize;*/
+	transition: background 0.4s, margin 0.2s;
+}
+
+.resultFriendsListCard:hover {
+	background: lightgrey!important;
+}
+
+.resultFriendsListCard:active {
+	background: rgb(200,200,200);
+	margin: 2%;
+	margin-top: 0%;
+}
+
+.directValue {
+	background: rgb(240,240,240);
+}
+
+textarea {
+	resize: none;
+	outline: solid 3px transparent;
+	border: dashed 2px lightgrey;
+	border-radius: 8px;
+	padding: 6%;
+}
+
+#data-location {
+	position: relative;
+	width: 100%;
+	left: 50%;
+	transform: translate(-50%,0);
+	text-align: justify;
+}
+
+.eventInput {
+	outline: solid 3px transparent;
+	border: dashed 2px lightgrey;
+	border-radius: 8px;
+	padding: 6%;
+}
+
+#data-name {
+	position: relative;
+	width: 100%;
+}
+
+#data-desc {
+	position: relative;
+	width: 100%;
+	margin-top: 10%;
+}
+
+.chosenFriend {
+	background: var(--cl-blue)!important;
+	color: white!important;
+	transition: 0.4s background;
+}
+
+.eventTextName {
+	position: relative;
+	margin-left: 16%;
+	margin-top: 4%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: white;
+	font-size: 0.8rem;
+}
+
+.eventTextDesc {
+	position: relative;
+	margin-left: 16%;
+	margin-top:-10%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: white;
+	font-size: 0.6rem;
+}
+
+.menuCard {
+	z-index: 999;
+	position: absolute;
+	top: 14%;
+	right: 20%;
+	color: white;
+	cursor: help;
+}
+
+.menuIkonShow {
+	position: absolute;
+}
+
+article.eventFeedCardWrapper {
+	box-shadow: 0px 0px 6px 2px lightgrey;
+	width: 100%;
+	padding: 2%;
+	margin-top: 1%;
+	margin-bottom: 4%;
+	transition: box-shadow 0.2s;
+	border-radius: 30px;
+	cursor: pointer;
+}
+
+article.eventFeedCardWrapper:hover {
+	box-shadow: 0px 0px 20px 6px grey;
+	z-index: -1;
+}
+
+article.eventCardWrapper {
+	box-shadow: 0px 0px 6px 2px lightgrey;
+	width: 100%;
+	padding: 2%;
+	margin-top: 1%;
+	margin-bottom: 4%;
+	border-radius: 30px;
+}
+
+.eventFeedCardInner {
+	position: relative;
+	border-radius: 20px;
+	width: 100%;
+	padding: 5%;
+	height: 100%;
+	border-radius: 20px;
+	background: white;
+}
+
+p.eventCardEnd {
+	position: absolute;
+	right: 6%;
+	top: 14%;
+}
+
+p.eventCardStart {
+	position: absolute;
+	right: 6%;
+	top: 34%;
+}
+
+#goBackArrowChange {
+	position: relative;
+	font-size: 400%;
+	left: 50%;
+	transform: translate(-50%,0);
+	color: grey;
+	cursor: pointer;
+}
+
+/*
+https://cssgradient.io/
+display: none; with media
+*/

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block link %}
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+	<link rel="stylesheet" href="{% static 'sign.css' %}">
+	<link rel="stylesheet" href="{% static 'prettyinput/input.css' %}">
+
+{% endblock %}
+
+{%block title %} Kaldender | Sign in {% endblock %}
+
+{% block content %}
+
+	<section>
+
+		<p class="display-1">bulter</p>
+
+		<div id="backgroundWrapper">
+		</div>
+
+		<div id='userInfoWrapper'>
+			<h1>Lad os komme igang</h1>
+			<h4>Vi skal bare lige kende dig lidt</h4>
+
+			<br>
+			<form type="get" action="/dash/manage">
+				{% csrf_token %}
+				<input type='hidden' name="type" value='up'>
+
+				<div style="width:100%">
+					<div class="pretty-input" id="username">username</div>
+					<div class="pretty-input" id="email">email</div>
+					<div class="pretty-input" id="password">!password</div>
+				</div>
+
+				<input type="submit" id="createButton_" class="btn btn-outline-danger text-center enterButton" value="Create"/>
+
+			</form>
+		</div>
+
+	</section>
+
+{% endblock %}
+
+{% block js %}
+
+	<script type="text/javascript" src="{% static 'prettyinput/input.js' %}"></script>
+	<script type="text/javascript">
+
+		wrapper = document.getElementById('backgroundWrapper')
+		var row = 6, col = 10;
+
+		var ele;
+		for (var i = 0; i < (row*col); i++) {
+			div = document.createElement('div')
+			div.classList.add('backgroundCard')
+			div.style.background = 'rgb(' + Math.round(255*Math.random()) + ',' + Math.round(255*Math.random()) + ',' + Math.round(255*Math.random())  + ')'
+
+			wrapper.appendChild(div)
+		}
+
+	</script>
+
+
+{% endblock %}

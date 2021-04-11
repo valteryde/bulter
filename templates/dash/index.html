@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block link %}
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+	<link rel="stylesheet" href="{% static 'dash.css' %}">
+
+	<script type="text/javascript">	
+		var infoLock = false;
+		var colorPickerLock = false;
+		var hideNshowMenuLock = false;
+
+		
+		// USERNAME, PUBLIC INFOMRATION
+		const user = '{{user}}';
+		//**********************************
+
+		//PRIVATE, DO NOT DISTRIBUTE FARTHER.
+		const scKode = '{{hk}}';
+		//**********************************
+
+		var friends = [
+			{% for friend in friends %}
+
+			'{{friend.username}}',
+
+			{%endfor%}
+
+		]; //and they become *friends*
+
+		//måske bruge dem her til events sammen med nogle andre punch farver.
+		var colortemplates = [
+			['#FFAEBC', '#4C5270', '#BCECE0', '#ACEEF3', '#FFB067', '#B5E5CF', '#F8EA8C', '#EEB5EB','#FFE9E4','#059DC0'],
+
+		]
+
+		//var eventColors = colortemplates.random();
+		var eventColors = colortemplates[0];
+		
+		// De her er lækre!
+		var colors = ['#3D5B59'];
+
+		// set color to 
+		const events = [
+		{% for i, ptp in events %}
+	
+		{
+			uidf: {{i.id}},
+			id:'{{forloop.counter}}',
+			name:'{{i.nameOfEve}}',
+			desc:'{{i.descOfEve}}', 
+			place:'{{i.place}}',
+			start:'{{i.startDate|date:"d-m-Y"}}',
+			end:'{{i.endDate|date:"d-m-Y"}}',
+			ptp:'{{ptp}}',
+		},
+
+		{% endfor %}
+		]
+
+		var last = {{last}}
+
+		// count how many events in one day.
+		var days = {}
+		var proc;
+
+		const todayDate = {{today}};
+
+	</script>
+	<script type="text/javascript" src="{% static 'dash.js' %}"></script>
+	<script type="text/javascript">const background = colors.random();</script>
+
+{% endblock %}
+
+{%block title %} Kaldender | {{user}} {% endblock %}
+
+
+{% block content %}
+	
+	<nav class="navbar navbar-light bg-light navbarCustom us">
+		<h1>&nbsp;<img src="{% static 'ikonPngBulter.png' %}" width="40" height="40" class="d-inline-block align-top" style="opacity: 0.7;" alt="Bulter ikon"> &nbsp;bulter</h1>
+
+		<div class="navBarLinks">
+			<a target='_blank' href='mailto:valteryde@hotmail.com' class='btn btn-outline-dark m-1'>
+				Kontakt
+				<i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i>
+			</a>
+			<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Hjælp til <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
+			<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Meld et problem <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
+		</div>
+
+		<div class="navBarMenuOpen">
+			<i class='material-icons' style='font-size:inherit;'>menu</i>
+		</div>
+	</nav>
+
+
+	<section class='row wrapper-cal' onmousemove="displayPreview(event)">
+
+		{% for i in lastDay %}
+			
+			{% if i == today %}
+				<article id='out-{{i}}' class='outerCard col-lg-2' onclick='marker(this)'>
+					<div id='dt-{{i}}' class='card today'>
+						<p class='numDate'> {{i}} </p>	
+					</div>
+					<div id='menu-{{i}}' class="menuCard">
+						<i class='material-icons menuIkonShow'>info_outline</i>
+					</div>
+				</article>
+			{% else %}
+				<article id='out-{{i}}' class='outerCard col-lg-2' onclick='marker(this)'>
+					<div id='dt-{{i}}' class='card'>
+						<p class='numDate'> {{i}} </p>
+					</div>
+					<div id='menu-{{i}}' class="menuCard">
+						<i class='material-icons menuIkonShow'>info_outline</i>
+					</div>
+				</article>
+
+			{% endif %}
+
+		{% endfor %}
+
+
+		<div id='adeCardFeedWrapper'>
+			<h3 class="text-justify h3">
+				<i class="material-icons iconmid">person</i>
+				{{user}}
+			</h3>
+
+			<article onclick="openInfoModal(todayDate)" class="cardWrapper" id="todayCard">
+				<h5 style="border-bottom: solid 3px grey">Dagens aftaler</h5>
+				<div id="todayCardParahraphWrapper"></div>
+
+			</article>
+			<article class="cardWrapper">
+				{% lorem 20 w %}
+			</article>
+
+
+			<button id="logoutButton" class="btn btn-outline-danger text-center" style="right:10%;bottom:4%;position:absolute!important;">Logout<i class="material-icons iconmid">chevron_right</i></button>
+				
+		</div>
+
+
+	</section>
+
+	<section class='row'>
+
+	</section>
+
+
+{% endblock %}
+
+{% block js %}
+	
+	<!-- modal -->
+	<div class="modal fade" id="ChangeModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="ChangeModalLabel">Aftale</h5>
+					<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<div class='container'>
+						<section class='row'>
+							
+							<div class='col-lg-4 col-md-6 text-center'>
+								
+								<i class="material-icons">event</i>
+								<p id='data-EventStart'></p>
+								<p id='data-EventEnd'></p>
+
+							</div>
+							
+							<div class='col-lg-4 col-md-6 text-center'>
+								<i class="material-icons">explore</i>
+								
+								<textarea id='data-location' placeholder='Et sted i verden...'></textarea>
+
+							</div>
+							
+							<div class='col-lg-4 col-md-6 text-center'>
+								<i class="material-icons">face</i>
+								
+								<input placeholder='{{user}}s aftale' class='eventInput' id='data-name' type='text' name='nameOfEventInput'>
+
+								<textarea placeholder='hvad skal der ske?' class='eventInput' id='data-desc' type='text' name='descOfEventInput'></textarea>
+								
+							</div>
+
+						</section>
+
+						<section class='row m-4'>
+							
+							<div class='col-lg-12 text-center'>
+								
+								<!-- start by seing all users -->
+								<!-- if users is not recognised just send a link via email-->
+
+								<div style='position:relative;left:-5%' class='text-left'>&nbsp;<i class="material-icons">group</i></div>
+								<div id='friendWrapper'>
+									<input placeholder='@dinevenner' onkeyup='searchForFriend(event.target.value)' id='friendInvite' type="text" name="friendInput"/>
+									<br>
+									<div id='resultFriendsList'>
+									
+									</div>
+								</div>
+
+							</div>
+
+						</section>
+
+
+					</div>
+
+				</div>
+				<div class="modal-footer">
+				<button id='createAEvent' type="button" class="btn btn-success p-1">
+					&nbsp;<i class="material-icons" style='font-size:1.5rem'>add</i>&nbsp;
+
+				</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Aftale modal -->
+	<div class="modal fade" id="infoModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="InfoModalLabel">Dine Aftaler</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+
+					<section id='eventFeed'></section>
+
+					<div id='updateEvent'></div>
+
+				</div>
+
+				<!--
+				<div class="modal-footer">
+
+				</div>
+				-->
+
+			</div>
+		</div>
+	</div>
+
+
+
+	<script type="text/javascript">
+		
+		$('#ChangeModal').on('hidden.bs.modal', function () {
+			colorPickerLock = false;
+			eraseColor();
+		});
+		$('#infoModal').on('hidden.bs.modal', function () {
+			colorPickerLock = false;
+			document.getElementById('eventFeed').style.display = 'block';
+			document.getElementById('updateEvent').style.display = 'none';
+		})
+
+		assignColor()
+
+		$("#createAEvent").click(function(){
+		
+			data_nm = document.getElementById('data-name').value
+			data_desc = document.getElementById('data-desc').value
+			data_place = document.getElementById('data-location').value
+
+			url = "manage?type=create&user={{user}}&hk={{hk}}&place="+data_place+'&start='+data_start+'&end='+data_end+'&name='+data_nm+'&desc='+data_desc+'&ptp='+chosenFriends.join('-');
+
+			$.ajax({url: url, success: function(result){
+				if (result == '[SUCCESS]') {
+					window.location.reload();
+				}
+			}});
+
+			$('#ChangeModal').modal('hide');
+			document.getElementById('data-name').value = '';
+			document.getElementById('data-location').value = '';
+			document.getElementById('data-desc').value = '';
+		});
+
+		if (window.innerWidth > 800) {$('.menuCard').hide();} else {hideNshowMenuLock = true;}
+
+		$(".outerCard").mouseenter(function(result){	
+			if (hideNshowMenuLock) {return;}
+
+			if (infoLock) {return;}
+
+			var id = result.currentTarget.id.replace('out-', '')
+
+			if (!days[id]) {return;}
+
+			$('#menu-'+id).animate({
+				opacity: 'show'
+			}, 'fast');
+		});
+
+		$(".outerCard").mouseleave(function(result){	
+			if (hideNshowMenuLock) {return;}
+			var id = result.currentTarget.id.replace('out-', '')
+			$('#menu-'+id).animate({
+				opacity: 'hide'
+			}, 'fast');
+		});
+
+
+		$(".menuCard").click(function (result) {
+			openInfoModal(result.currentTarget.id.replace('menu-', ''))
+
+		})
+
+		$('#logoutButton').click((result)=>{
+			document.cookie = 'username=; Max-Age=0; path=/';
+			document.cookie = 'userCode=; Max-Age=0; path=/';
+			window.location.reload()
+		});
+
+
+		var h = '<ul>';
+		for (var i = 0; i < days[todayDate].length; i++) {
+			h += '<li>' + days[todayDate][i][0].name + '</li>';
+		}
+		h += '</ul>';
+
+		$('#todayCardParahraphWrapper').html(h);
+
+
+	</script>
+
+
+{% endblock %}
+
+
+<!-- 
+
+if (Object.values(colored[i].classList).indexOf('today') === -1) {
+	colored[i].style.background = 'white';
+else {
+	colored[i].style.background = 'colorfull';
+}
+
+
+når der skal gives farver til folk så bruger en class som
+
+.sofie {
+	color: blue;
+}
+
+fordi så kan den bruges igen og igen.
+
+lav en menu der popper ud når man "hover" på dagene og så kan man se dagen fra en modal. 
+
+-->

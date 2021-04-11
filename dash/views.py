@@ -202,6 +202,7 @@ def index(request):
 	return render(request, 'dash/index.html', context)
 
 
+# NOTER
 # "ikke disponipel"
 # for andre kan man se at den person har en aftale
 # lidt ligsom "in call" på teams så man kan se at den person ikke

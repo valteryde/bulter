@@ -5,12 +5,11 @@
 	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
 	<link rel="stylesheet" href="{% static 'dash.css' %}">
 
-	<script type="text/javascript">	
+	<script type="text/javascript">
 		var infoLock = false;
 		var colorPickerLock = false;
 		var hideNshowMenuLock = false;
 
-		
 		// USERNAME, PUBLIC INFOMRATION
 		const user = '{{user}}';
 		//**********************************
@@ -36,19 +35,19 @@
 
 		//var eventColors = colortemplates.random();
 		var eventColors = colortemplates[0];
-		
+
 		// De her er lækre!
 		var colors = ['#3D5B59'];
 
-		// set color to 
+		// set color to
 		const events = [
 		{% for i, ptp in events %}
-	
+
 		{
 			uidf: {{i.id}},
 			id:'{{forloop.counter}}',
 			name:'{{i.nameOfEve}}',
-			desc:'{{i.descOfEve}}', 
+			desc:'{{i.descOfEve}}',
 			place:'{{i.place}}',
 			start:'{{i.startDate|date:"d-m-Y"}}',
 			end:'{{i.endDate|date:"d-m-Y"}}',
@@ -74,9 +73,8 @@
 
 {%block title %} Kaldender | {{user}} {% endblock %}
 
-
 {% block content %}
-	
+
 	<nav class="navbar navbar-light bg-light navbarCustom us">
 		<h1>&nbsp;<img src="{% static 'ikonPngBulter.png' %}" width="40" height="40" class="d-inline-block align-top" style="opacity: 0.7;" alt="Bulter ikon"> &nbsp;bulter</h1>
 
@@ -98,11 +96,11 @@
 	<section class='row wrapper-cal' onmousemove="displayPreview(event)">
 
 		{% for i in lastDay %}
-			
+
 			{% if i == today %}
 				<article id='out-{{i}}' class='outerCard col-lg-2' onclick='marker(this)'>
 					<div id='dt-{{i}}' class='card today'>
-						<p class='numDate'> {{i}} </p>	
+						<p class='numDate'> {{i}} </p>
 					</div>
 					<div id='menu-{{i}}' class="menuCard">
 						<i class='material-icons menuIkonShow'>info_outline</i>
@@ -131,16 +129,19 @@
 
 			<article onclick="openInfoModal(todayDate)" class="cardWrapper" id="todayCard">
 				<h5 style="border-bottom: solid 3px grey">Dagens aftaler</h5>
-				<div id="todayCardParahraphWrapper"></div>
+				<div id="todayCardParahraphWrapper">Ingen aftaler</div>
 
 			</article>
+
+			<!--
 			<article class="cardWrapper">
 				{% lorem 20 w %}
 			</article>
+			-->
 
 
 			<button id="logoutButton" class="btn btn-outline-danger text-center" style="right:10%;bottom:4%;position:absolute!important;">Logout<i class="material-icons iconmid">chevron_right</i></button>
-				
+
 		</div>
 
 
@@ -154,7 +155,7 @@
 {% endblock %}
 
 {% block js %}
-	
+
 	<!-- modal -->
 	<div class="modal fade" id="ChangeModal">
 		<div class="modal-dialog">
@@ -169,37 +170,37 @@
 
 					<div class='container'>
 						<section class='row'>
-							
+
 							<div class='col-lg-4 col-md-6 text-center'>
-								
+
 								<i class="material-icons">event</i>
 								<p id='data-EventStart'></p>
 								<p id='data-EventEnd'></p>
 
 							</div>
-							
+
 							<div class='col-lg-4 col-md-6 text-center'>
 								<i class="material-icons">explore</i>
-								
+
 								<textarea id='data-location' placeholder='Et sted i verden...'></textarea>
 
 							</div>
-							
+
 							<div class='col-lg-4 col-md-6 text-center'>
 								<i class="material-icons">face</i>
-								
+
 								<input placeholder='{{user}}s aftale' class='eventInput' id='data-name' type='text' name='nameOfEventInput'>
 
 								<textarea placeholder='hvad skal der ske?' class='eventInput' id='data-desc' type='text' name='descOfEventInput'></textarea>
-								
+
 							</div>
 
 						</section>
 
 						<section class='row m-4'>
-							
+
 							<div class='col-lg-12 text-center'>
-								
+
 								<!-- start by seing all users -->
 								<!-- if users is not recognised just send a link via email-->
 
@@ -208,7 +209,7 @@
 									<input placeholder='@dinevenner' onkeyup='searchForFriend(event.target.value)' id='friendInvite' type="text" name="friendInput"/>
 									<br>
 									<div id='resultFriendsList'>
-									
+
 									</div>
 								</div>
 
@@ -262,7 +263,7 @@
 
 
 	<script type="text/javascript">
-		
+
 		$('#ChangeModal').on('hidden.bs.modal', function () {
 			colorPickerLock = false;
 			eraseColor();
@@ -276,7 +277,7 @@
 		assignColor()
 
 		$("#createAEvent").click(function(){
-		
+
 			data_nm = document.getElementById('data-name').value
 			data_desc = document.getElementById('data-desc').value
 			data_place = document.getElementById('data-location').value
@@ -297,7 +298,7 @@
 
 		if (window.innerWidth > 800) {$('.menuCard').hide();} else {hideNshowMenuLock = true;}
 
-		$(".outerCard").mouseenter(function(result){	
+		$(".outerCard").mouseenter(function(result){
 			if (hideNshowMenuLock) {return;}
 
 			if (infoLock) {return;}
@@ -311,7 +312,7 @@
 			}, 'fast');
 		});
 
-		$(".outerCard").mouseleave(function(result){	
+		$(".outerCard").mouseleave(function(result){
 			if (hideNshowMenuLock) {return;}
 			var id = result.currentTarget.id.replace('out-', '')
 			$('#menu-'+id).animate({
@@ -347,7 +348,7 @@
 {% endblock %}
 
 
-<!-- 
+<!--
 
 if (Object.values(colored[i].classList).indexOf('today') === -1) {
 	colored[i].style.background = 'white';
@@ -364,6 +365,6 @@ når der skal gives farver til folk så bruger en class som
 
 fordi så kan den bruges igen og igen.
 
-lav en menu der popper ud når man "hover" på dagene og så kan man se dagen fra en modal. 
+lav en menu der popper ud når man "hover" på dagene og så kan man se dagen fra en modal.
 
 -->

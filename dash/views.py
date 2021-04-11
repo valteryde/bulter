@@ -34,8 +34,8 @@ def manageRequest(request):
 
 		if check_password(request.GET['password'], user.password):
 			response = HttpResponseRedirect('../dash')
-			response.set_cookie('userCode', user.scVarChar, 60) #måske sekunder?
-			response.set_cookie('username', user.username, 60)
+			response.set_cookie('userCode', user.scVarChar, 60*60*4) #ca 4 timer
+			response.set_cookie('username', user.username, 60*60*4)
 			return response
 		else:
 			return HttpResponseRedirect('/')

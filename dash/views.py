@@ -4,9 +4,102 @@ from django.shortcuts import render, HttpResponse
 import calendar
 from datetime import datetime
 from pytz import timezone
-from .models import User, Event, UserEvent
+from .models import User, Event, UserEvent, get_random_string_60
 from django.http import HttpResponseRedirect
+from django.utils.crypto import get_random_string
 #import requests
+
+# using the Fernet module
+from cryptography.fernet import Fernet
+
+# getting key
+key = Fernet.generate_key()
+f = Fernet(key)
+RULE = (2,get_random_string(2))
+
+
+def v_encrypt(s):
+
+	"""
+	rules:
+		the 2. 3. and 5. char is 5, q and t.
+	"""
+
+	msg = ''
+	for i in range(len(s)):
+		if i == 0:
+			msg += s[i]
+		else:
+			if i % RULE[0] == 0:
+				msg += RULE[1] + s[i]
+			else:
+				msg += s[i]
+
+	msg += '('+str(len(s))+')'
+	return f.encrypt(msg.encode()).decode()
+
+
+def v_decrypt_n_verify(s):
+
+	"""
+	verify with rules from the encryption
+	"""
+
+	s = f.decrypt(s.encode()).decode()
+	clear = True
+
+	msg = ''
+	offset = 0
+
+	start = s.index('(')
+	numb = int(s[start+1: s.index(')')])
+	s = s[:start]
+
+	try:
+		for j in range(len(s)): # måske kan man gøre len(s), 1 for at starte der...
+
+			if j > 0:
+
+				i = j + offset
+
+				if s[i] != '':
+
+					if i % RULE[0] == 0:
+
+						if s[i:i+len(RULE[1])] != RULE[1]:
+							clear = False
+						else:
+							offset += len(RULE[1])
+							msg += s[i+len(RULE[1])]
+					else:
+						msg += s[i]
+			else:
+				msg += s[0]
+
+	except IndexError:
+		pass
+
+	if clear and numb == len(msg):
+		return msg
+	else:
+		return False
+
+
+def check_for_rerouting(request):
+
+	if request.COOKIES.get('rerouting') != '':
+
+		rerouting_type = request.COOKIES.get('rerouting')
+
+		if rerouting_type == 'invite':
+			response = HttpResponseRedirect('/invite/tunnel')
+		else:
+			response = HttpResponseRedirect('/')
+
+		response.set_cookie('rerouting', '')
+		return (True, response)
+	else:
+		return (False, None)
 
 
 # NOT IN USE AT THE MOMENT... TERRIBLE API.
@@ -24,6 +117,7 @@ def manageRequest(request):
 
 	#check if sc is real
 	if request.GET['type'] == 'in':
+
 		userList = User.objects.filter(username=request.GET['username'])
 
 		if len(userList) <= 0:
@@ -50,13 +144,13 @@ def manageRequest(request):
 				userEmail=request.GET['email'],
 				password = make_password(request.GET['password'], salt=None, hasher='default'),
 			)
-			return HttpResponseRedirect('../')
+			resp = HttpResponseRedirect('/')
+			resp.set_cookie('username', user.username, 60*60*4)
+			resp.set_cookie('userCode', user.scVarChar, 60*60*4)
+			return resp
 		except Exception as e:
 			print(str(e))
 			return HttpResponse('[ERROR] 500 Something went wrong <a href="/">go back</a>')
-
-
-		#make_password(password, salt=None, hasher='default')
 
 	if len(User.objects.filter(scVarChar=request.GET['hk'], username=request.GET['user'])) != 1:
 		return HttpResponse('[ERROR] access denied')
@@ -71,10 +165,24 @@ def manageRequest(request):
 	elif request.GET['type'] == 'removeuser':
 		return removeUser(request)
 
-	return 'none'
+	elif request.GET['type'] == 'share':
+		return createShareLink()
+
+	return HttpResponse('[ERROR] Request matched 0 types')
+
+
+def createShareLink():
+
+	shareKey = get_random_string_60()
+	response = HttpResponse(shareKey)
+	response.set_cookie('shareKey',v_encrypt(shareKey), 60*60*0.5)
+	return response
+	#return HttpResponse(v_encrypt(shareKey))
 
 
 def createEvent(request):
+
+	response = HttpResponse('[SUCCESS]')
 
 	"""
 	need to know:
@@ -102,13 +210,32 @@ def createEvent(request):
 	if len(place) == 0:
 		place = 'Verden';
 
-	event = Event.objects.create(
-		place=place,
-		nameOfEve=name,
-		descOfEve=desc,
-		startDate="-".join(start),
-		endDate="-".join(end)
-	)
+
+	if request.COOKIES.get('shareKey') == '' or not request.COOKIES.get('shareKey'):
+
+		event = Event.objects.create(
+			place=place,
+			nameOfEve=name,
+			descOfEve=desc,
+			startDate="-".join(start),
+			endDate="-".join(end)
+		)
+	else:
+
+		shKey = v_decrypt_n_verify(request.COOKIES.get('shareKey'))
+		if not shKey:
+			return HttpResponse('[ERROR] Wrong share code')
+
+		event = Event.objects.create(
+			shareKey = shKey,
+			place=place,
+			nameOfEve=name,
+			descOfEve=desc,
+			startDate="-".join(start),
+			endDate="-".join(end)
+		)
+
+		response.set_cookie('shareKey', '')
 
 	UserEvent.objects.create(
 		eventKey=event,
@@ -123,7 +250,7 @@ def createEvent(request):
 				userKey=User.objects.filter(username=p)[0]
 			)
 
-	return HttpResponse('[SUCCESS]')
+	return response
 
 
 def deleteEvent(request):
@@ -162,6 +289,10 @@ def authenticateUser(request):
 
 
 def index(request):
+
+	r = check_for_rerouting(request)
+	if r[0]:
+		return r[1]
 
 	if not authenticateUser(request):
 		return HttpResponseRedirect('/sign')

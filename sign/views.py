@@ -6,6 +6,6 @@ def index(request):
 	context = {}
 	return render(request, 'sign/signin.html', context)
 
-def signup(request):
+def signup_standard(request):
 	context = {}
 	return render(request, 'sign/signup.html', context)

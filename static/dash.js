@@ -1,4 +1,6 @@
 
+var eventShareCode;
+
 Array.prototype.random = function(first_argument) {
 	index = Math.floor(Math.random()*this.length)
 	return this[index];
@@ -11,10 +13,10 @@ Array.prototype.random = function(first_argument) {
 function searchForChild(ele, change) {
 	for (var i = 0; i < ele.children.length; i++) {
 		child = ele.children[i]
-					
+
 		for (var j = 0; j < child.classList.length; j++) {
 			if (child.classList[j].slice(0,5) == 'data-') {
-						
+
 				child.style.background = change;
 				break;
 			}
@@ -64,14 +66,14 @@ function openEventCreater(a, b) {
 	var month = d.getMonth()+1;
 
 	if (month < 10) {
-		month = '0' + month.toString() 
+		month = '0' + month.toString()
 	}
 
 	start = Math.min(parseFloat(a), parseFloat(b));
 	if (start < 10) {
 		start = '0' + start.toString();
 	}
-	start += '-' + month + '-' + year;		
+	start += '-' + month + '-' + year;
 	end = Math.max(parseFloat(a), parseFloat(b));
 	if (end < 10) {
 		end = '0' + end.toString();
@@ -102,7 +104,7 @@ function marker(target) {
 		searchForChild(document.getElementById('dt-'+set.toString()), background)
 	}
 }
- 
+
 // display the "snake" of the event.
 // fire on move.
 var mousePos;
@@ -116,9 +118,9 @@ function displayPreview(e) {
 	}
 
 	if (e.target.id.slice(0,3) != 'dt-') {
-				
+
 		for (var j = 0; j < e.target.classList.length; j++) {
-					
+
 			if (e.target.classList[j].slice(0,5) == 'data-') {
 				found = j;
 				break;
@@ -129,7 +131,7 @@ function displayPreview(e) {
 			return;
 		}
 	}
-			
+
 	if (found !== -1) {
 		target = e.target.classList[found];
 		targetNr = target.replace('data-', '');
@@ -164,14 +166,14 @@ function sepEvents() {
 		var wrap = document.getElementById('dt-'+i);
 
 		for (var j = 0; j < days[i].length; j++) {
-					
+
 			div = document.createElement('div');
 			div.classList.add('eventInCard')
 			div.style.height = (1/days[i].length*100).toString()+'%';
 			div.style.top = (j*1/days[i].length*100).toString()+'%';
 			div.classList.add(days[i][j][1])
 			div.classList.add('data-'+i)
-			
+
 			var eventData = days[i][j][0];
 			div.innerHTML = '<p class="eventTextName">'+eventData.name+'</p>';
 			div.innerHTML += '<p class="eventTextDesc">' + (eventData.ptp.slice(0,eventData.ptp.length-1).replaceAll('-', ', ')) + '</p>'
@@ -183,7 +185,7 @@ function sepEvents() {
 
 
 function assignColor (month=4) {
-			
+
 	//console.log(events)
 	/*
 
@@ -212,7 +214,7 @@ function assignColor (month=4) {
 
 		// edge case -- event spans full month.
 		if (event.start.split('-')[1] < month && event.end.split('-')[1] > month) {
-					
+
 			startDate = 1;
 			endDate = last;
 
@@ -220,9 +222,9 @@ function assignColor (month=4) {
 
 			// month check...
 			if (event.start.split('-')[1] != month) {
-					
+
 				if (event.end.split('-')[1] == month) {
-						
+
 					startDate = 1;
 
 				} else {
@@ -234,13 +236,13 @@ function assignColor (month=4) {
 
 		var nmOfClass = 'eve-'+event.ptp.replaceAll('-','');
 		event.class = nmOfClass
-				
+
 		if (startDate > endDate) {
 			endDate = 31;
 		}
 
 		for (var j = startDate; j < endDate+1; j++) {
-					
+
 					// for new month
 			if (j > last) {
 				break;
@@ -258,7 +260,7 @@ function assignColor (month=4) {
 	}
 
 	style.innerHTML = ih;
-			
+
 	document.getElementsByTagName('head')[0].appendChild(style);
 	//document.getElementById('someElementId').className = 'cssClass';
 
@@ -291,14 +293,14 @@ function searchForFriend (e=null) {
 			}
 		}
 	}
-			
-	res += '<button class="resultFriendsListCard directValue">' + val + '</button>';
+
+	res += '<button onclick="getshareLink()" class="resultFriendsListCard directValue">få link til<strong> ' + val + '</strong></button>';
 	//res += '<button class="resultFriendsListCard directValue"><l class="material-icons">link</i>' + val + '</button>';
 	document.getElementById('resultFriendsList').innerHTML = res;
 }
 
 function addFriend (e, state) {
-			
+
 	ele = e.target;
 	if (state == 1) {
 		chosenFriends.push(ele.innerHTML);
@@ -320,10 +322,10 @@ function openInfoModal (dayNr) {
 	eventsDay = days[dayNr]
 
 	var r = '';
-			
+
 	for (var i = 0; i < eventsDay.length; i++) {
 		event = eventsDay[i][0];
-				
+
 		let func = "changeSectionInModal(" + event.id + ")"
 
 		r += '<article onclick="'+func+'" class="eventFeedCardWrapper '+event.class+'">';
@@ -384,13 +386,13 @@ function changeSectionInModal (id) {
 
 	r += '<article class="eventCardWrapper '+e.class+'">';
 	r += '<div class="eventFeedCardInner">';
-			
+
 	r += '<h4 style="width:60%">' + e.name + '</h5>';
 	r += '<p>' + e.desc + '</p>'
 	r += '<p><i class="material-icons" style="vertical-align: middle;">group</i><strong> ' + e.ptp.slice(0,e.ptp.length-1).replaceAll('-', ', ') + '</strong></p>';
 
 	r += '<button onclick="deleteEvent('+ e.uidf +')" class="btn btn-outline-danger">Slet aftale</button>&nbsp;'
-			
+
 	//NEEDS RETOUCH
 	if (e.ptp.length > 0) {
 		r += '<button onclick="backOut('+ e.uidf +')" class="btn btn-outline-dark">Meld fra</button>'
@@ -400,4 +402,24 @@ function changeSectionInModal (id) {
 	r += '<i onclick="goBack()" id="goBackArrowChange" class="material-icons">keyboard_backspace</i>';
 
 	wrapper.innerHTML = r;
+}
+
+function getshareLink() {
+
+	if (!eventShareCode) {
+		url = "manage?type=share&hk="+scKode+"&user="+user;
+		$.ajax({url:url, success:(response)=>{
+			eventShareCode = response
+			$('.directValue').html('<input class="directValueInput" value="'+window.location.hostname + ':8000' + '/invite/link/' + response +'">')
+		}})
+	} else {
+
+	//thanks to https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
+	copyText = document.getElementsByClassName('directValueInput')[0]
+	copyText.select();
+	copyText.setSelectionRange(0, 99999);
+
+	document.execCommand("copy")
+
+	}
 }

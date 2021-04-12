@@ -85,12 +85,47 @@
 			</a>
 			<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Hjælp til <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
 			<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Meld et problem <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
+			<a id="logoutButtonNavBar" class="btn btn-outline-danger logoutButtons m-1">Logout<i class="material-icons iconmid">chevron_right</i></a>
+
 		</div>
 
 		<div class="navBarMenuOpen">
-			<i class='material-icons' style='font-size:inherit;'>menu</i>
+			<i id="navbarmenuIkon" class='material-icons' style='font-size:inherit;'>menu</i>
 		</div>
 	</nav>
+
+
+	<div class=backDropSideBar></div>
+	<section class="sideBar">
+
+		<h1 class="text-right">bulter</h1>
+		<h5 class="text-right">Dine aftaler i fokus</h5>
+		<br>
+
+
+		<ul class="text-right">
+			<li>
+				<a target='_blank' href='mailto:valteryde@hotmail.com' class='btn btn-outline-dark m-1'>
+					Kontakt
+					<i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i>
+				</a>
+			</li>
+
+			<li>
+				<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Hjælp til <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
+			</li>
+
+			<li>
+				<a href="https://github.com/" target="_blank" class='btn btn-outline-dark m-1'>Meld et problem <i style="font-size:100%;vertical-align:middle;" class="material-icons">open_in_new</i></a>
+			</li>
+
+			<li>
+				<a class="btn btn-outline-danger logoutButtons m-1">Logout<i class="material-icons iconmid">chevron_right</i></a>
+			</li>
+
+		</ul>
+
+	</section>
 
 
 	<section class='row wrapper-cal' onmousemove="displayPreview(event)">
@@ -139,8 +174,7 @@
 			</article>
 			-->
 
-
-			<button id="logoutButton" class="btn btn-outline-danger text-center" style="right:10%;bottom:4%;position:absolute!important;">Logout<i class="material-icons iconmid">chevron_right</i></button>
+			<button id="logoutButton" class="btn btn-outline-danger text-center logoutButtons">Logout<i class="material-icons iconmid">chevron_right</i></button>
 
 		</div>
 
@@ -320,18 +354,38 @@
 			}, 'fast');
 		});
 
-
 		$(".menuCard").click(function (result) {
 			openInfoModal(result.currentTarget.id.replace('menu-', ''))
 
 		})
 
-		$('#logoutButton').click((result)=>{
+		$('.logoutButtons').click((result)=>{
 			document.cookie = 'username=; Max-Age=0; path=/';
 			document.cookie = 'userCode=; Max-Age=0; path=/';
 			window.location.reload()
 		});
 
+		$('#navbarmenuIkon').click((result)=> {
+			$('.sideBar').show();
+			$('.backDropSideBar').show();
+
+
+			$('.sideBar').animate({
+				display: 'show',
+				left: '60vw',
+			})
+		})
+
+		$('.backDropSideBar').click(()=> {
+
+			$('.backDropSideBar').hide();
+
+			$('.sideBar').animate({
+				left: '100vw',
+			}, 'medium', function () {
+				$('.sideBar').hide();
+			})
+		});
 
 		var h = '<ul>';
 		for (var i = 0; i < days[todayDate].length; i++) {
@@ -341,30 +395,7 @@
 
 		$('#todayCardParahraphWrapper').html(h);
 
-
 	</script>
 
 
 {% endblock %}
-
-
-<!--
-
-if (Object.values(colored[i].classList).indexOf('today') === -1) {
-	colored[i].style.background = 'white';
-else {
-	colored[i].style.background = 'colorfull';
-}
-
-
-når der skal gives farver til folk så bruger en class som
-
-.sofie {
-	color: blue;
-}
-
-fordi så kan den bruges igen og igen.
-
-lav en menu der popper ud når man "hover" på dagene og så kan man se dagen fra en modal.
-
--->

@@ -1,5 +1,6 @@
 
 var eventShareCode;
+var eventShareCodeButton;
 
 Array.prototype.random = function(first_argument) {
 	index = Math.floor(Math.random()*this.length)
@@ -176,7 +177,10 @@ function sepEvents() {
 
 			var eventData = days[i][j][0];
 			div.innerHTML = '<p class="eventTextName">'+eventData.name+'</p>';
-			div.innerHTML += '<p class="eventTextDesc">' + (eventData.ptp.slice(0,eventData.ptp.length-1).replaceAll('-', ', ')) + '</p>'
+			let p = (eventData.ptp.slice(0,eventData.ptp.length-1).replaceAll('-', ', '))
+			p = p.replaceAll('_', ' ')
+
+			div.innerHTML += '<p class="eventTextDesc">' + p + '</p>'
 
 			wrap.appendChild(div);
 		}
@@ -269,6 +273,7 @@ function assignColor (month=4) {
 
 // search for friends
 var chosenFriends = [];
+var chosenFriendTrivialName = [];
 var lastVal = '';
 function searchForFriend (e=null) {
 
@@ -276,7 +281,8 @@ function searchForFriend (e=null) {
 
 	var res = '';
 	for (var i = 0; i < chosenFriends.length; i++) {
-		res += '<button onclick="addFriend(event, -1)" class="resultFriendsListCard chosenFriend">' + chosenFriends[i] + '</button>'
+		let para = "'"+chosenFriends[i]+"'"
+		res += '<button onclick="addFriend('+para+', null, -1)" class="resultFriendsListCard chosenFriend">' + chosenFriendTrivialName[i] + '</button>'
 	}
 
 	if (!val) {
@@ -287,25 +293,32 @@ function searchForFriend (e=null) {
 	lastVal = val;
 
 	for (var i = 0; i < friends.length; i++) {
-		if (friends[i].slice(0,val.length) == val) {
-			if (chosenFriends.indexOf(friends[i]) == -1) {
-				res += '<button onclick="addFriend(event, 1)" class="resultFriendsListCard">' + friends[i] + '</button>';
+		if ((friends[i][0].slice(0,val.length)).toLowerCase() == val.toLowerCase()) {
+			if (chosenFriends.indexOf(friends[i][0]) == -1) {
+				let para = "'"+ friends[i][0] +"', '"+friends[i][1]+"'"
+				res += '<button onclick="addFriend('+para+', 1)" class="resultFriendsListCard">' + friends[i][1] + '</button>';
 			}
 		}
 	}
 
-	res += '<button onclick="getshareLink()" class="resultFriendsListCard directValue">få link til<strong> ' + val + '</strong></button>';
+	if (!eventShareCode) {
+		res += '<button onclick="getshareLink()" class="resultFriendsListCard directValue">få link til<strong> ' + val + '</strong></button>';
+	} else {
+		res += eventShareCodeButton
+		}
 	//res += '<button class="resultFriendsListCard directValue"><l class="material-icons">link</i>' + val + '</button>';
 	document.getElementById('resultFriendsList').innerHTML = res;
 }
 
-function addFriend (e, state) {
+function addFriend (email, name, state) {
 
-	ele = e.target;
 	if (state == 1) {
-		chosenFriends.push(ele.innerHTML);
+		chosenFriends.push(email);
+		chosenFriendTrivialName.push(name)
 	} else if (state == -1) {
-		chosenFriends.splice(chosenFriends.indexOf(ele.innerHTML),1)
+		chosenFriendTrivialName.splice(chosenFriends.indexOf(email),1)
+		chosenFriends.splice(chosenFriends.indexOf(email),1)
+
 	}
 	document.getElementById('friendInvite').value = '';
 	searchForFriend('');
@@ -331,7 +344,7 @@ function openInfoModal (dayNr) {
 		r += '<article onclick="'+func+'" class="eventFeedCardWrapper '+event.class+'">';
 		r += '<div class="eventFeedCardInner">'
 		r += '<h4 style="width:60%">' + event.name + '</h5>';
-		r += '<h6><i class="material-icons" style="vertical-align: middle;">group</i> ' + event.ptp.slice(0,event.ptp.length-1).replaceAll('-', ', ') + '</h6>';
+		r += '<h6><i class="material-icons" style="vertical-align: middle;">group</i> ' + (event.ptp.slice(0,event.ptp.length-1).replaceAll('-', ', ')).replaceAll('_',' ') + '</h6>';
 		r += '<p>' + event.desc + '</p>'
 		r += '<p><strong>' + 'Sted: ' + '</strong>' + event.place + '</p>';
 		r += '<p class="eventCardStart">' + event.start + '</p>'
@@ -353,7 +366,7 @@ function goBack() {
 
 function deleteEvent (id) {
 
-	url = "manage?type=delete&hk="+scKode+"&user="+user+"&eveID="+id;
+	url = "manage?type=delete&hk="+scKode+"&email="+user+"&eveID="+id;
 
 	$.ajax({url: url, success: function(result){
 		console.log(result)
@@ -365,7 +378,7 @@ function deleteEvent (id) {
 
 function backOut(id) {
 
-	url = "manage?type=removeuser&hk="+scKode+"&user="+user+"&eveID="+id;
+	url = "manage?type=removeuser&hk="+scKode+"&email="+user+"&eveID="+id;
 
 	$.ajax({url: url, success: function(result){
 		console.log(result)
@@ -389,7 +402,7 @@ function changeSectionInModal (id) {
 
 	r += '<h4 style="width:60%">' + e.name + '</h5>';
 	r += '<p>' + e.desc + '</p>'
-	r += '<p><i class="material-icons" style="vertical-align: middle;">group</i><strong> ' + e.ptp.slice(0,e.ptp.length-1).replaceAll('-', ', ') + '</strong></p>';
+	r += '<p><i class="material-icons" style="vertical-align: middle;">group</i><strong> ' + (e.ptp.slice(0,e.ptp.length-1).replaceAll('-', ', ')).replaceAll('_', ' ') + '</strong></p>';
 
 	r += '<button onclick="deleteEvent('+ e.uidf +')" class="btn btn-outline-danger">Slet aftale</button>&nbsp;'
 
@@ -407,10 +420,11 @@ function changeSectionInModal (id) {
 function getshareLink() {
 
 	if (!eventShareCode) {
-		url = "manage?type=share&hk="+scKode+"&user="+user;
+		url = "manage?type=share&hk="+scKode+"&email="+user;
 		$.ajax({url:url, success:(response)=>{
 			eventShareCode = response
 			$('.directValue').html('<input class="directValueInput" value="'+window.location.hostname + ':8000' + '/invite/link/' + response +'">')
+			eventShareCodeButton = '<button onclick="getshareLink()" class="resultFriendsListCard directValue"><input class="directValueInput" value="'+window.location.hostname + ':8000' + '/invite/link/' + response +'"></button>'
 		}})
 	} else {
 

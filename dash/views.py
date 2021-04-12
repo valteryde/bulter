@@ -118,9 +118,9 @@ def manageRequest(request):
 	#check if sc is real
 	if request.GET['type'] == 'in':
 
-		userList = User.objects.filter(username=request.GET['username'])
+		userList = User.objects.filter(userEmail=request.GET['email'])
 
-		if len(userList) <= 0:
+		if len(userList) != 1:
 			#[ERROR] No user found
 			return HttpResponseRedirect('/')
 		else:
@@ -129,7 +129,7 @@ def manageRequest(request):
 		if check_password(request.GET['password'], user.password):
 			response = HttpResponseRedirect('../dash')
 			response.set_cookie('userCode', user.scVarChar, 60*60*4) #ca 4 timer
-			response.set_cookie('username', user.username, 60*60*4)
+			response.set_cookie('email', user.userEmail, 60*60*4)
 			return response
 		else:
 			return HttpResponseRedirect('/')
@@ -145,14 +145,14 @@ def manageRequest(request):
 				password = make_password(request.GET['password'], salt=None, hasher='default'),
 			)
 			resp = HttpResponseRedirect('/')
-			resp.set_cookie('username', user.username, 60*60*4)
+			resp.set_cookie('email', user.userEmail, 60*60*4)
 			resp.set_cookie('userCode', user.scVarChar, 60*60*4)
 			return resp
 		except Exception as e:
 			print(str(e))
 			return HttpResponse('[ERROR] 500 Something went wrong <a href="/">go back</a>')
 
-	if len(User.objects.filter(scVarChar=request.GET['hk'], username=request.GET['user'])) != 1:
+	if len(User.objects.filter(scVarChar=request.GET['hk'], userEmail=request.GET['email'])) != 1:
 		return HttpResponse('[ERROR] access denied')
 	#else:
 
@@ -222,18 +222,30 @@ def createEvent(request):
 		)
 	else:
 
-		shKey = v_decrypt_n_verify(request.COOKIES.get('shareKey'))
-		if not shKey:
-			return HttpResponse('[ERROR] Wrong share code')
+		try: #this could be a VERY bad fix. But hey it works...
+			shKey = v_decrypt_n_verify(request.COOKIES.get('shareKey'))
 
-		event = Event.objects.create(
-			shareKey = shKey,
-			place=place,
-			nameOfEve=name,
-			descOfEve=desc,
-			startDate="-".join(start),
-			endDate="-".join(end)
-		)
+			if not shKey:
+				return HttpResponse('[ERROR] Wrong share code')
+
+			event = Event.objects.create(
+				shareKey = shKey,
+				place=place,
+				nameOfEve=name,
+				descOfEve=desc,
+				startDate="-".join(start),
+				endDate="-".join(end)
+			)
+
+		except Exception:
+
+			event = Event.objects.create(
+				place=place,
+				nameOfEve=name,
+				descOfEve=desc,
+				startDate="-".join(start),
+				endDate="-".join(end)
+			)
 
 		response.set_cookie('shareKey', '')
 
@@ -247,7 +259,7 @@ def createEvent(request):
 		for p in ptp:
 			UserEvent.objects.create(
 				eventKey=event,
-				userKey=User.objects.filter(username=p)[0]
+				userKey=User.objects.filter(userEmail=p)[0]
 			)
 
 	return response
@@ -258,7 +270,7 @@ def deleteEvent(request):
 	e = Event.objects.filter(id=request.GET['eveID'])
 	if len(e) != 1:
 		return HttpResponse('[ERROR] NO EVENT MATCHED')
-	ue = UserEvent.objects.filter(eventKey=e[0], userKey=User.objects.get(username=request.GET['user']))
+	ue = UserEvent.objects.filter(eventKey=e[0], userKey=User.objects.get(userEmail=request.GET['email']))
 	if len(ue) <= 0:
 		return HttpResponse('[ERROR] access denied for event')
 
@@ -271,7 +283,7 @@ def removeUser(request):
 	e = Event.objects.filter(id=request.GET['eveID'])
 	if len(e) != 1:
 		return HttpResponse('[ERROR] NO EVENT MATCHED')
-	ue = UserEvent.objects.filter(eventKey=e[0], userKey=User.objects.get(username=request.GET['user']))
+	ue = UserEvent.objects.filter(eventKey=e[0], userKey=User.objects.get(userEmail=request.GET['email']))
 	if len(ue) <= 0:
 		return HttpResponse('[ERROR] access denied for event')
 
@@ -281,7 +293,7 @@ def removeUser(request):
 
 def authenticateUser(request):
 	try:
-		if User.objects.filter(username=request.COOKIES.get('username'))[0].scVarChar == request.COOKIES.get('userCode'):
+		if User.objects.filter(userEmail=request.COOKIES.get('email'))[0].scVarChar == request.COOKIES.get('userCode'):
 			return True
 		return False
 	except Exception as e:
@@ -314,22 +326,23 @@ def index(request):
 	today = dt
 
 	# pull data from db.
-	user = User.objects.get(username=request.COOKIES.get('username'))
+	user = User.objects.get(userEmail=request.COOKIES.get('email'))
 	events = Event.objects.filter(userevent__userKey=user.id)
 
 	ptp = []
 	for i in events:
 		l = ''
 		for j in UserEvent.objects.filter(eventKey=i.id).order_by('userKey__id'):
-			if j.userKey.username != user.username:
+			if j.userKey.userEmail != user.userEmail:
 				l += str(j.userKey.username) + '-'
 		ptp.append(l)
 
+	print(l)
 	events = list(zip(events, ptp))
 
 	otherusers = User.objects.exclude(id=user.id)
 
-	context = {'hk':user.scVarChar, 'lastDay':range(1,lastDay+1), 'today':int(today[-1]), 'user':user.username, 'events':events, 'last':lastDay, 'friends':otherusers}
+	context = {'hk':user.scVarChar, 'lastDay':range(1,lastDay+1), 'today':int(today[-1]), 'user':user.username, 'events':events, 'last':lastDay, 'friends':otherusers, 'email':user.userEmail, 'usershort':user.username.split(' ')[0]}
 	return render(request, 'dash/index.html', context)
 
 

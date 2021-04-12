@@ -8,10 +8,10 @@ def mergeTunnel(request):
 
     #print('throug tunnel')
 
-    if User.objects.filter(username=request.COOKIES.get('username'))[0].scVarChar != request.COOKIES.get('userCode'):
+    if User.objects.filter(userEmail=request.COOKIES.get('email'))[0].scVarChar != request.COOKIES.get('userCode'):
         return HttpResponse('[ERROR]')
 
-    user = User.objects.get(username=request.COOKIES.get('username'))
+    user = User.objects.get(userEmail=request.COOKIES.get('email'))
     invited_event = Event.objects.filter(shareKey=request.COOKIES.get('shareCodeNew'))
     if len(invited_event) != 1:
         return HttpResponse('[ERROR] False link')

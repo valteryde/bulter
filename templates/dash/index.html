@@ -11,7 +11,7 @@
 		var hideNshowMenuLock = false;
 
 		// USERNAME, PUBLIC INFOMRATION
-		const user = '{{user}}';
+		const user = '{{email}}';
 		//**********************************
 
 		//PRIVATE, DO NOT DISTRIBUTE FARTHER.
@@ -21,7 +21,7 @@
 		var friends = [
 			{% for friend in friends %}
 
-			'{{friend.username}}',
+			['{{friend.userEmail}}','{{friend.username}}'],
 
 			{%endfor%}
 
@@ -30,7 +30,6 @@
 		//måske bruge dem her til events sammen med nogle andre punch farver.
 		var colortemplates = [
 			['#FFAEBC', '#4C5270', '#BCECE0', '#ACEEF3', '#FFB067', '#B5E5CF', '#F8EA8C', '#EEB5EB','#FFE9E4','#059DC0'],
-
 		]
 
 		//var eventColors = colortemplates.random();
@@ -51,7 +50,7 @@
 			place:'{{i.place}}',
 			start:'{{i.startDate|date:"d-m-Y"}}',
 			end:'{{i.endDate|date:"d-m-Y"}}',
-			ptp:'{{ptp}}',
+			ptp:'{{ptp}}'.replaceAll(' ', '_'),
 		},
 
 		{% endfor %}
@@ -159,7 +158,7 @@
 		<div id='adeCardFeedWrapper'>
 			<h3 class="text-justify h3">
 				<i class="material-icons iconmid">person</i>
-				{{user}}
+				{{usershort}}
 			</h3>
 
 			<article onclick="openInfoModal(todayDate)" class="cardWrapper" id="todayCard">
@@ -316,7 +315,7 @@
 			data_desc = document.getElementById('data-desc').value
 			data_place = document.getElementById('data-location').value
 
-			url = "manage?type=create&user={{user}}&hk={{hk}}&place="+data_place+'&start='+data_start+'&end='+data_end+'&name='+data_nm+'&desc='+data_desc+'&ptp='+chosenFriends.join('-');
+			url = "manage?type=create&email={{email}}&hk={{hk}}&place="+data_place+'&start='+data_start+'&end='+data_end+'&name='+data_nm+'&desc='+data_desc+'&ptp='+chosenFriends.join('-');
 
 			$.ajax({url: url, success: function(result){
 				if (result == '[SUCCESS]') {
@@ -387,13 +386,16 @@
 			})
 		});
 
-		var h = '<ul>';
-		for (var i = 0; i < days[todayDate].length; i++) {
-			h += '<li>' + days[todayDate][i][0].name + '</li>';
-		}
-		h += '</ul>';
 
-		$('#todayCardParahraphWrapper').html(h);
+		if (days[todayDate]) {
+			var h = '<ul>';
+				for (var i = 0; i < days[todayDate].length; i++) {
+					h += '<li>' + days[todayDate][i][0].name + '</li>';
+				}
+				h += '</ul>';
+
+				$('#todayCardParahraphWrapper').html(h);
+		}
 
 	</script>
 
